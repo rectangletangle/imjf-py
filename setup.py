@@ -8,6 +8,6 @@ setup(
     author='Drew French',
     author_email='rectangletangle@gmail.com',
     url='https://github.com/rectangletangle/imjf-py',
-    download_url='https://codeload.github.com/rectangletangle/imjf-py/legacy.tar.gz/0.0.0',
+    download_url='https://github.com/rectangletangle/imjf-py/tarball/0.0.0',
     install_requires=['requests']
 )
