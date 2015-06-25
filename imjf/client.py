@@ -8,7 +8,7 @@ from .exceptions import IMJFException
 API_DOMAIN_NAME = 'api.ismyjsfucked.com'
 API_VERSION = 'v0'
 
-def is_my_js_fucked(urls):
+def ismyjsfucked(urls):
     """ Takes URLs and determines if their JavaScript code is broken. Returning `True` indicates that at least one
         URL is confirmed for being broken. `None` indicates that at least one URL is unknown. `False` indicates
         everything is ok. An `IMJFException` will be raised if something goes wrong. """
