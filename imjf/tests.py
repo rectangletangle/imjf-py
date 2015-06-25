@@ -21,9 +21,9 @@ class TestIntegration(unittest.TestCase):
         assert is_my_js_fucked(self.url('timeout')) is None
 
     def test_precedence(self):
-        assert is_my_js_fucked(self.url('ok'), self.url('syntax-error'), self.url('timeout')) is True
-        assert is_my_js_fucked(self.url('ok'), self.url('syntax-error')) is True
-        assert is_my_js_fucked(self.url('ok'), self.url('timeout')) is None
+        assert is_my_js_fucked([self.url('ok'), self.url('syntax-error'), self.url('timeout')]) is True
+        assert is_my_js_fucked([self.url('ok'), self.url('syntax-error')]) is True
+        assert is_my_js_fucked([self.url('ok'), self.url('timeout')]) is None
 
     def test_invalid_url(self):
         with self.assertRaises(IMJFException) as context:

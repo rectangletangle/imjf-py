@@ -8,17 +8,17 @@ from .exceptions import IMJFException
 API_DOMAIN_NAME = 'api.ismyjsfucked.com'
 API_VERSION = 'v0'
 
-def is_my_js_fucked(*urls):
+def is_my_js_fucked(urls):
     """ Takes URLs and determines if their JavaScript code is broken. Returning `True` indicates that at least one
         URL is confirmed for being broken. `None` indicates that at least one URL is unknown. `False` indicates
         everything is ok. An `IMJFException` will be raised if something goes wrong. """
 
-    return report(*urls).get('fucked', None)
+    return report(urls).get('fucked', None)
 
-def report(*urls):
+def report(urls):
     """ This returns a detailed report for the URLs, or raises an `IMJFException`. """
 
-    for status_code, report in _poll_reports(*urls):
+    for status_code, report in _poll_reports(urls):
         pass
 
     if _isnt_ok(status_code):
@@ -54,7 +54,7 @@ def _is_done(report):
 def _isnt_ok(status_code):
     return not str(status_code).startswith('2')
 
-def _poll_reports(*urls):
+def _poll_reports(urls):
     status_code, report = _request_json('POST', _api_url('reports'), urls)
 
     try:
