@@ -30,3 +30,12 @@ class TestIntegration(unittest.TestCase):
             ismyjsfucked('not-a-valid-url')
 
         assert str(context.exception) == "Invalid URL 'not-a-valid-url'"
+
+    def test_404(self):
+        url = 'http://www.ismyjsfucked.com/success-stories/'
+
+        assert ismyjsfucked(url) is None
+        assert ismyjsfucked(url, ignore_status_code=False) is None
+
+        assert ismyjsfucked(url, True) is False
+        assert ismyjsfucked(url, ignore_status_code=True) is False

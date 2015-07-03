@@ -15,6 +15,7 @@ False
 ```
 
 ## Dependencies
+* Python 2 or 3
 * [requests](http://docs.python-requests.org/)
 
 ## Installation

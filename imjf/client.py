@@ -1,24 +1,26 @@
 
 import time
+import re
 
 import requests
 
 from .exceptions import IMJFException
 
+USER_AGENT = 'imjf-py'
 API_DOMAIN_NAME = 'api.ismyjsfucked.com'
 API_VERSION = 'v0'
 
-def ismyjsfucked(urls):
+def ismyjsfucked(urls, *args, **kw):
     """ Takes URLs and determines if their JavaScript code is broken. Returning `True` indicates that at least one
         URL is confirmed for being broken. `None` indicates that at least one URL is unknown. `False` indicates
         everything is ok. An `IMJFException` will be raised if something goes wrong. """
 
-    return report(urls).get('fucked', None)
+    return report(urls, *args, **kw).get('fucked', None)
 
-def report(urls):
+def report(urls, *args, **kw):
     """ This returns a detailed report for the URLs, or raises an `IMJFException`. """
 
-    for status_code, report in _poll_reports(urls):
+    for status_code, report in _poll_reports(urls, *args, **kw):
         pass
 
     if _isnt_ok(status_code):
@@ -36,15 +38,17 @@ def _api_url(*path):
 def _request_json(method, url, data=None):
     assert method.lower() in {'post', 'get'}
 
+    make_request = getattr(requests, method.lower())
+
     try:
-        response = getattr(requests, method.lower())(url, json=data)
+        response = make_request(url, json=data, headers={'User-Agent': USER_AGENT})
     except requests.RequestException:
-        raise IMJFException()
+        raise IMJFException('')
     else:
         try:
             json_data = response.json()
         except ValueError:
-            raise IMJFException()
+            raise IMJFException("The response's JSON wasn't valid")
         else:
             return (response.status_code, json_data)
 
@@ -52,10 +56,17 @@ def _is_done(report):
     return report.get('status', 'done') == 'done'
 
 def _isnt_ok(status_code):
-    return not str(status_code).startswith('2')
+    if status_code is None:
+        return True
+    else:
+        return re.match(r'^2\d\d$', str(status_code)) is None
 
-def _poll_reports(urls):
-    status_code, report = _request_json('POST', _api_url('reports'), urls)
+def _poll_reports(urls, ignore_status_code=False):
+
+    url_params = '?status-code=ignore' if ignore_status_code else ''
+
+    create_url = _api_url('reports') + url_params
+    status_code, report = _request_json('POST', create_url, urls)
 
     try:
         range_ = xrange
@@ -69,4 +80,6 @@ def _poll_reports(urls):
             break
         else:
             time.sleep(1)
-            status_code, report = _request_json('GET', _api_url('reports', str(report['id'])))
+
+            get_url = _api_url('reports', str(report['id'])) + url_params
+            status_code, report = _request_json('GET', get_url)
