@@ -35,7 +35,7 @@ class TestIntegration(unittest.TestCase):
         url = 'http://www.ismyjsfucked.com/success-stories/'
 
         assert ismyjsfucked(url) is None
-        assert ismyjsfucked(url, ignore_status_code=False) is None
+        assert ismyjsfucked(url, use_status_code=True) is None
 
-        assert ismyjsfucked(url, True) is False
-        assert ismyjsfucked(url, ignore_status_code=True) is False
+        assert ismyjsfucked(url, False) is False
+        assert ismyjsfucked(url, use_status_code=0) is False

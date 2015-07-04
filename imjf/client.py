@@ -11,9 +11,9 @@ API_DOMAIN_NAME = 'api.ismyjsfucked.com'
 API_VERSION = 'v0'
 
 def ismyjsfucked(urls, *args, **kw):
-    """ Takes URLs and determines if their JavaScript code is broken. Returning `True` indicates that at least one
-        URL is confirmed for being broken. `None` indicates that at least one URL is unknown. `False` indicates
-        everything is ok. An `IMJFException` will be raised if something goes wrong. """
+    """ This takes a list of URLs and determines if the JavaScript code is broken. Returning `True` indicates that at
+        least one URL is confirmed for being broken. `None` indicates that at least one URL is unknown. `False`
+        indicates everything is ok. An `IMJFException` will be raised if something goes wrong. """
 
     return report(urls, *args, **kw).get('fucked', None)
 
@@ -24,7 +24,7 @@ def report(urls, *args, **kw):
         pass
 
     if _isnt_ok(status_code):
-        raise IMJFException(report.get('message', ''))
+        raise IMJFException(report.get('message', 'Something went wrong'))
     else:
         return report
 
@@ -43,7 +43,7 @@ def _request_json(method, url, data=None):
     try:
         response = make_request(url, json=data, headers={'User-Agent': USER_AGENT})
     except requests.RequestException:
-        raise IMJFException('')
+        raise IMJFException('An error occurred while making a request to {api}'.format(api=API_DOMAIN_NAME))
     else:
         try:
             json_data = response.json()
@@ -61,9 +61,9 @@ def _isnt_ok(status_code):
     else:
         return re.match(r'^2\d\d$', str(status_code)) is None
 
-def _poll_reports(urls, ignore_status_code=False):
+def _poll_reports(urls, use_status_code=True):
 
-    url_params = '?status-code=ignore' if ignore_status_code else ''
+    url_params = '' if use_status_code else '?status-code=ignore'
 
     create_url = _api_url('reports') + url_params
     status_code, report = _request_json('POST', create_url, urls)
