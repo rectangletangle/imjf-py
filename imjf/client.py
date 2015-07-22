@@ -11,11 +11,11 @@ API_DOMAIN_NAME = 'api.ismyjsfucked.com'
 API_VERSION = 'v0'
 
 def ismyjsfucked(urls, *args, **kw):
-    """ This takes a list of URLs and determines if the JavaScript code is broken. Returning `True` indicates that at
-        least one URL is confirmed for being broken. `None` indicates that at least one URL is unknown. `False`
-        indicates everything is ok. An `IMJFException` will be raised if something goes wrong. """
+    """ This takes a list of URLs and determines if the JavaScript code is broken. Returning `False` indicates that
+        everything is ok. `True` indicates that at least one URL is confirmed for being broken. An `IMJFException`
+        will be raised if something goes wrong, or the fuckedness can't be fully determined. """
 
-    return report(urls, *args, **kw).get('fucked', None)
+    return bool(_get_or_imjf_exc(report(urls, *args, **kw), 'fucked'))
 
 def report(urls, *args, **kw):
     """ This returns a detailed report for the URLs, or raises an `IMJFException`. """
@@ -24,7 +24,7 @@ def report(urls, *args, **kw):
         pass
 
     if _isnt_ok(status_code):
-        raise IMJFException(report.get('message', 'Something went wrong'))
+        raise IMJFException(_message(report))
     else:
         return report
 
@@ -52,6 +52,14 @@ def _request_json(method, url, data=None):
         else:
             return (response.status_code, json_data)
 
+def _message(report):
+    defaultmessage = 'Something went wrong'
+
+    try:
+        return report.get('message', defaultmessage)
+    except (AttributeError, TypeError):
+        return defaultmessage
+
 def _is_done(report):
     return report.get('status', 'done') == 'done'
 
@@ -60,6 +68,12 @@ def _isnt_ok(status_code):
         return True
     else:
         return re.match(r'^2\d\d$', str(status_code)) is None
+
+def _get_or_imjf_exc(report, key):
+    try:
+        return report[key]
+    except (TypeError, KeyError):
+        raise IMJFException(_message(report))
 
 def _poll_reports(urls, use_status_code=True):
 
