@@ -75,9 +75,9 @@ def _get_or_imjf_exc(report, key):
     except (TypeError, KeyError):
         raise IMJFException(_message(report))
 
-def _poll_reports(urls, use_status_code=True):
+def _poll_reports(urls, use_response_status_code=True):
 
-    url_params = '' if use_status_code else '?status-code=ignore'
+    url_params = '' if use_response_status_code else '?response-status-code=ignore'
 
     create_url = _api_url('reports') + url_params
     status_code, report = _request_json('POST', create_url, urls)

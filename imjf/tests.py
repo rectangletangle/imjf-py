@@ -42,9 +42,9 @@ class TestIntegration(unittest.TestCase):
         url = 'http://www.ismyjsfucked.com/success-stories/'
 
         self.assert_unknown_state_exc(url)
-        self.assert_unknown_state_exc(url, use_status_code=True)
+        self.assert_unknown_state_exc(url, use_response_status_code=True)
 
         assert ismyjsfucked(url, False) is False
-        assert ismyjsfucked(url, use_status_code=0) is False
+        assert ismyjsfucked(url, use_response_status_code=0) is False
 
 
