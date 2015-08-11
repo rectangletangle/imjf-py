@@ -23,15 +23,11 @@ class TestIntegration(unittest.TestCase):
     def test_exception(self):
         assert ismyjsfucked(self.url('exception')) is True
 
-    def test_syntax_error(self):
-        assert ismyjsfucked(self.url('syntax-error')) is True
-
     def test_unknown(self):
         self.assert_unknown_state_exc(self.url('timeout'))
 
     def test_precedence(self):
-        self.assert_unknown_state_exc([self.url('ok'), self.url('syntax-error'), self.url('timeout')])
-        assert ismyjsfucked([self.url('ok'), self.url('syntax-error')]) is True
+        self.assert_unknown_state_exc([self.url('ok'), self.url('exception'), self.url('timeout')])
         assert ismyjsfucked([self.url('ok'), self.url('exception')]) is True
         self.assert_unknown_state_exc([self.url('ok'), self.url('timeout')])
 
