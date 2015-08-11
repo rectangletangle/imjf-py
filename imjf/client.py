@@ -11,9 +11,11 @@ API_DOMAIN_NAME = 'api.ismyjsfucked.com'
 API_VERSION = 'v0'
 
 def ismyjsfucked(urls, *args, **kw):
-    """ This takes a list of URLs and determines if the JavaScript code is broken. Returning `False` indicates that
-        everything is ok. `True` indicates that at least one URL is confirmed for being broken. An `IMJFException`
-        will be raised if something goes wrong, or the fuckedness can't be fully determined. """
+    """ This takes a list of URLs and determines if the JavaScript code is
+        broken. Returning `False` indicates that everything is ok. `True`
+        indicates that at least one URL is confirmed for being broken. An
+        `IMJFException` will be raised if something goes wrong, or the
+        fuckedness can't be fully determined. """
 
     verdict = report(urls, *args, **kw)
 
@@ -23,7 +25,8 @@ def ismyjsfucked(urls, *args, **kw):
         raise ReportException(verdict)
 
 def report(urls, *args, **kw):
-    """ This returns a detailed report for the URLs, or raises an `IMJFException`. """
+    """ This returns a detailed report for the URLs, or raises an
+        `IMJFException`. """
 
     for status_code, report in _poll_reports(urls, *args, **kw):
         pass
@@ -34,7 +37,9 @@ def report(urls, *args, **kw):
         raise ReportException(report)
 
 def _api_url(*path):
-    url = 'http://{domain_name}/{version}/'.format(domain_name=API_DOMAIN_NAME, version=API_VERSION)
+    url = 'http://{domain_name}/{version}/'.format(domain_name=API_DOMAIN_NAME,
+                                                   version=API_VERSION)
+
     if path:
         return url + '/'.join(path) + '/'
     else:
@@ -46,9 +51,12 @@ def _request_json(method, url, data=None):
     make_request = getattr(requests, method.lower())
 
     try:
-        response = make_request(url, json=data, headers={'User-Agent': USER_AGENT})
+        response = make_request(url,
+                                json=data,
+                                headers={'User-Agent': USER_AGENT})
     except requests.RequestException:
-        raise IMJFException('An error occurred while making a request to {api}'.format(api=API_DOMAIN_NAME))
+        messagetemplate = 'An error occurred while making a request to {api}'
+        raise IMJFException(messagetemplate.format(api=API_DOMAIN_NAME))
     else:
         try:
             json_data = response.json()
@@ -72,8 +80,8 @@ def _range(*args, **kw):
     return range_(*args, **kw)
 
 def _poll_reports(urls, use_response_status_code=True):
-
-    url_params = '' if use_response_status_code else '?response-status-code=ignore'
+    status_code_params = '?response-status-code=ignore'
+    url_params = '' if use_response_status_code else status_code_params
     create_url = _api_url('reports') + url_params
 
     status_code, report = _request_json('POST', create_url, urls)

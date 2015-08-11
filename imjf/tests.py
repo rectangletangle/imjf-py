@@ -2,20 +2,31 @@
 import unittest
 
 from .client import ismyjsfucked
-from .exceptions import IMJFException
+from .exceptions import IMJFException, ReportException
 
 class TestIntegration(unittest.TestCase):
     def url(self, test_name):
-        return 'http://www.ismyjsfucked.com/tests/{name}.html'.format(name=test_name)
+        urltemplate = 'http://www.ismyjsfucked.com/tests/{name}.html'
+        return urltemplate.format(name=test_name)
 
     def assert_exc_message(self, message, *args, **kw):
         with self.assertRaises(IMJFException) as context:
             ismyjsfucked(*args, **kw)
 
-        assert str(context.exception) == message
+        if isinstance(context.exception, ReportException):
+            assert isinstance(context.exception.data, dict)
+
+        excmessage = str(context.exception)
+
+        try:
+            assert excmessage == message
+        except AssertionError:
+            print(excmessage, message)
+            raise
 
     def assert_unknown_state_exc(self, *args, **kw):
-        self.assert_exc_message("Some details couldn't be confirmed", *args, **kw)
+        self.assert_exc_message("Some details couldn't be confirmed",
+                                *args, **kw)
 
     def test_ok(self):
         assert ismyjsfucked(self.url('ok')) is False
@@ -27,12 +38,18 @@ class TestIntegration(unittest.TestCase):
         self.assert_unknown_state_exc(self.url('timeout'))
 
     def test_precedence(self):
-        self.assert_unknown_state_exc([self.url('ok'), self.url('exception'), self.url('timeout')])
+        self.assert_unknown_state_exc([self.url('ok'),
+                                       self.url('exception'),
+                                       self.url('timeout')])
+
         assert ismyjsfucked([self.url('ok'), self.url('exception')]) is True
-        self.assert_unknown_state_exc([self.url('ok'), self.url('timeout')])
+
+        self.assert_unknown_state_exc([self.url('ok'),
+                                       self.url('timeout')])
 
     def test_invalid_url(self):
-        self.assert_exc_message("Invalid URL 'not-a-valid-url'", 'not-a-valid-url')
+        self.assert_exc_message("Invalid URL 'not-a-valid-url'",
+                                'not-a-valid-url')
 
     def test_404(self):
         url = 'http://www.ismyjsfucked.com/success-stories/'
