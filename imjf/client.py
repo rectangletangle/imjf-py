@@ -90,7 +90,9 @@ def _poll_reports(urls, use_response_status_code=True):
         yield (status_code, report)
 
         if _is_ok(status_code) and not report['done']:
-            time.sleep(1)
+
+            time.sleep(float(report.get('wait', 1.0)))
+
             get_url = _api_url('reports', str(report['id'])) + url_params
             status_code, report = _request_json('GET', get_url)
         else:
